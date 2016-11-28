@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:batch="http://www.springframework.org/schema/batch"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:context="http://www.springframework.org/schema/context"  
+    xmlns:tx="http://www.springframework.org/schema/tx"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+    http://www.springframework.org/schema/batch   
+    http://www.springframework.org/schema/batch/spring-batch-3.0.xsd  
+    http://www.springframework.org/schema/context   
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+    http://www.springframework.org/schema/tx   
+    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">  
+    
+    <!-- 配置spring扫描范围 -->  
+    <context:component-scan base-package="com.report" />  
+    
+    <!-- 引入spring核心配置文件 -->  
+    <import resource="hk/springBatch.xml"/>  
+<!--     <import resource="uk/springBatch.xml"/>    -->
+    
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">  
+        <property name="transactionManager" ref="transactionManager" />  
+    </bean>  
+      
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">  
+        <property name="jobRepository" ref="jobRepository" />  
+    </bean>  
+      
+    <tx:annotation-driven transaction-manager="transactionManager" />  
+    <!-- 触发器工厂，将所有的定时任务都注入工厂-->    
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">    
+        <!-- 添加触发器 -->    
+        <property name="triggers">    
+            <list>    
+                <!-- 将上面定义的测试定时任务注入（可以定义多个定时任务，同时注入）-->    
+                <ref local="hk_reportCronTrigger2" />
+<!--                 <ref local="uk_reportCronTrigger" /> -->
+            </list>    
+        </property>    
+    </bean>    
+</beans>    
